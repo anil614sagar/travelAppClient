@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+	<head>
+		<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<title>jQuery Mobile Bootstrap Theme</title>
+		<link rel="stylesheet" href="themes/Bootstrap.css">
+		<link rel="stylesheet" href="css/travelApp.css">
+		<link rel="stylesheet" href="css/jquery.mobile.structure-1.4.0.min.css" />
+		<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+		<script src="js/jquery-1.8.2.min.js"></script>
+		<script src="js/jquery.mobile-1.4.0.min.js"></script>
+		<script src="js/apigee.js"></script>
+
+		<script>
+
+		$(function(){
+			// Initializing the SDK
+			var client = new Apigee.Client({
+					orgName:'asagar.nodeapp', // Your Apigee.com username for App Services
+					appName:'travelapp' // Your Apigee App Services app name
+			});
+
+			// Reading data
+			var todos = new Apigee.Collection({ "client":client, "type":"traveltodos" });
+			todos.fetch(
+					function(err, data) { // Success
+							if (err) {
+									alert("read failed");
+							} else {
+									while(todos.hasNextEntity()) {
+											var todo = todos.getNextEntity();
+											$("#things-todo").html('<ul data-role="listview" data-inset="true" data-divider-theme="b"><li data-role="list-divider">'+ todo.get("title") +'</li></ul>').enhanceWithin();
+									}
+									$.mobile.loading( "hide" );
+							}
+			});
+
+
+			$('#form-add-todo').on('click', '#btn-submit', function() {
+				 var newTodo = {
+				   title:$('#todo').val(),
+				   country:$('#select-country').val()
+				 }
+				 todos.addEntity(newTodo, function(error, response) {
+				   if (error) {
+				     alert('write failed');
+				   } else{
+				     alert('write success ');
+						 window.location.href = "listviews.html";
+				   };
+         });
+      });
+
+			var countries;
+			$.mobile.loader.prototype.options.text = "loading";
+			$.mobile.loader.prototype.options.textVisible = false;
+			$.mobile.loader.prototype.options.theme = "b";
+			$.mobile.loader.prototype.options.html = "";
+			$.mobile.loading( "show", {
+				text: "Loading...",
+				textVisible: true,
+				theme: "z",
+				html: ""
+			});
+			$.get("http://asagarnodeapp-test.apigee.net/travel-app/countriesList", function( data ) {
+				countries = data;
+				$.each(data, function (i, item) {
+					$('#select-country').append($('<option>', {
+							value: item.alpha2Code,
+							text : item.name
+					}));
+				});
+				$('#select-country').selectmenu();
+				$('#select-country').selectmenu('refresh', true);
+				$.mobile.loading( "hide" );
+			});
+		});
+
+		</script>
+
+	</head>
+	<body>
+		<div data-role="page" data-theme="a">
+			<div data-role="header" data-position="inline">
+				<h1>My Travel App</h1>
+				<div data-role="navbar">
+					<ul>
+						<li><a data-ajax="false" href="index.html" data-icon="home">Home</a></li>
+						<li><a data-ajax="false" href="listviews.html" data-icon="grid">Things To Do</a></li>
+						<li><a data-ajax="false" href="forms.html" data-icon="gear" class="ui-btn-active">Add TODO</a></li>
+					</ul>
+				</div>
+			</div>
+			<div data-role="content" data-theme="a">
+
+				<h2>I would like to do....</h2>
+
+				<form action="#" method="get" id="form-add-todo">
+					<div data-role="fieldcontain">
+						<label for="select-country" class="select">Choose Country :</label>
+						<select name="select-country" id="select-country" data-native-menu="false">
+							<option>Country</option>
+						</select>
+					</div>
+					<div data-role="fieldcontain">
+						<label for="textarea">TODO :</label>
+						<textarea cols="40" rows="8" name="textarea" id="todo"></textarea>
+					</div>
+					<div class="ui-body ui-body-b">
+						<fieldset class="ui-grid-a">
+							<div class="ui-block-a form-button"><button type="submit" data-theme="d">Cancel</button></div>
+							<div class="ui-block-b form-button"><button id="btn-submit" type="submit" data-theme="a">Submit</button></div>
+							</fieldset>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</body>
+</html>

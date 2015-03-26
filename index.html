@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+	<head>
+		<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<title>jQuery Mobile Bootstrap Theme</title>
+		<link rel="stylesheet" href="themes/Bootstrap.css">
+		<link rel="stylesheet" href="css/jquery.mobile.structure-1.4.0.min.css" />
+		<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+		<script src="js/jquery-1.8.2.min.js"></script>
+		<script src="js/jquery.mobile-1.4.0.min.js"></script>
+		<script>
+
+		$(function(){
+			var countries;
+			$.mobile.loader.prototype.options.text = "loading";
+      $.mobile.loader.prototype.options.textVisible = false;
+      $.mobile.loader.prototype.options.theme = "b";
+      $.mobile.loader.prototype.options.html = "";
+			$.mobile.loading( "show", {
+        text: "Loading...",
+        textVisible: true,
+        theme: "z",
+        html: ""
+      });
+			$(".ui-block-calling-code").hide();
+			$(".ui-block-timezone").hide();
+			$(".ui-block-capital").hide();
+			$.get("http://asagarnodeapp-test.apigee.net/travel-app/countriesList", function( data ) {
+				countries = data;
+				$.each(data, function (i, item) {
+			    $('#select-country').append($('<option>', {
+			        value: item.alpha2Code,
+			        text : item.name
+			    }));
+        });
+				$('#select-country').selectmenu();
+				$('#select-country').selectmenu('refresh', true);
+				$.mobile.loading( "hide" );
+      });
+			$("#select-country").change(function() {
+				var result = $.grep(countries, function(e){ return e.alpha2Code == $("#select-country").val(); });
+				$(".ui-block-calling-code").show();
+				$(".ui-block-timezone").show();
+				$(".ui-block-capital").show();
+				// Set values
+				console.log(result[0]);
+				$('#calling-code').html(result[0].callingcode);
+				$('#time-zone').html(result[0].timezones[0]);
+				$('#capital').html(result[0].capital);
+
+
+      });
+    });
+
+		</script>
+	</head>
+	<body>
+		<div data-role="page" data-theme="a">
+			<div data-role="header" data-position="inline">
+				<h1>My Travel App</h1>
+				<div data-role="navbar">
+					<ul>
+						<li><a data-ajax="false" href="index.html" data-icon="home" class="ui-btn-active">Home</a></li>
+						<li><a data-ajax="false" href="listviews.html" data-icon="grid">Things To Do</a></li>
+						<li><a data-ajax="false" href="forms.html" data-icon="gear">Add a To Do</a></li>
+					</ul>
+				</div>
+			</div>
+			<div data-role="content" data-theme="a">
+				<form action="#" method="get">
+					<div data-role="fieldcontain">
+						<label for="select-country" class="select">Choose Country :</label>
+						<select name="select-country" id="select-country" data-native-menu="false">
+							<option>Country</option>
+						</select>
+					</div>
+				</form>
+			</div>
+			<div data-role="content" data-theme="a">
+				<div class="ui-grid-b">
+					  <div class="ui-block-a ui-block-calling-code">
+							<div class="ui-bar ui-bar-b ui-bar-api" style="height:60px">
+								<div class="ui-block-title"><h2>Calling Code</h2></div>
+								<div class="ui-block-content" id="calling-code"></div>
+							</div>
+						</div>
+				    <div class="ui-block-b ui-block-timezone">
+							<div class="ui-bar ui-bar-b ui-bar-api" style="height:60px">
+								<div class="ui-block-title"><h2>Time Zone</h2></div>
+								<div class="ui-block-content" id="time-zone"></div>
+							</div>
+						</div>
+						<div class="ui-block-b ui-block-capital">
+							<div class="ui-bar ui-bar-b ui-bar-api" style="height:60px">
+								<div class="ui-block-title"><h2>Capital</h2></div>
+								<div class="ui-block-content" id="capital"></div>
+							</div>
+						</div>
+				</div>
+		  </div>
+		</div>
+	</body>
+</html>

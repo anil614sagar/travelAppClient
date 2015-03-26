@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+	<head>
+		<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1">
+		<title>jQuery Mobile Bootstrap Theme</title>
+		<link rel="stylesheet" href="themes/Bootstrap.css">
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.0/jquery.mobile.structure-1.4.0.min.css" />
+		<link rel="stylesheet" href="themes/jquery.mobile.icons.min.css" />
+		<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+		<script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
+		<script src="js/apigee.js"></script>
+		<script>
+		$(function(){
+			$.mobile.loader.prototype.options.text = "loading";
+			$.mobile.loader.prototype.options.textVisible = false;
+			$.mobile.loader.prototype.options.theme = "a";
+			$.mobile.loader.prototype.options.html = "";
+			$.mobile.loading( "show", {
+				text: "Loading...",
+				textVisible: true,
+				theme: "z",
+				html: ""
+			});
+			// Initializing the SDK
+			var client = new Apigee.Client({
+					orgName:'asagar.nodeapp', // Your Apigee.com username for App Services
+					appName:'travelapp' // Your Apigee App Services app name
+			});
+
+			// Reading data
+			var todos = new Apigee.Collection({ "client":client, "type":"traveltodos" });
+			todos.fetch(
+					function(err, data) { // Success
+							if (err) {
+									alert("read failed");
+							} else {
+									while(todos.hasNextEntity()) {
+											var todo = todos.getNextEntity();
+											$("#things-todo").append('<ul data-role="listview" data-inset="true" data-divider-theme="b"><li data-role="list-divider">'+ todo.get("title") +'</li></ul>').enhanceWithin();
+									}
+									$.mobile.loading( "hide" );
+							}
+					});
+		});
+		</script>
+	</head>
+	<body>
+		<div data-role="page" data-theme="a">
+			<div data-role="header" data-position="inline">
+				<h1>My Travel App</h1>
+				<div data-role="navbar">
+					<ul>
+						<li><a data-ajax="false" href="index.html" data-icon="home">Home</a></li>
+						<li><a data-ajax="false" href="listviews.html" data-icon="grid" class="ui-btn-active">Things To Do</a></li>
+						<li><a data-ajax="false" href="forms.html" data-icon="gear">Add a To Do</a></li>
+					</ul>
+				</div>
+			</div>
+			<div data-role="content" id="things-todo" data-theme="a">
+
+				<h2>Things TODO..</h2>
+
+
+			</div>
+		</div>
+	</body>
+</html>
